@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 
@@ -15,8 +15,14 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 dataset_path = "wine.csv"  # <-- REPLACE THIS LINE WITH YOUR ACTUAL CSV PATH
 # ==============================================================================
 
-# 1. Read dataset
-df = pd.read_csv(dataset_path)
+# 1. Read dataset (with encoding fallback)
+try:
+    df = pd.read_csv(dataset_path, encoding='utf-8')
+except UnicodeDecodeError:
+    df = pd.read_csv(dataset_path, encoding='latin-1')
+
+# Drop common ID/index columns if present
+df = df.drop(columns=[c for c in df.columns if c.lower() in ['id', 'unnamed: 0']], errors='ignore').dropna()
 
 # Display first 5-6 columns and first 5 rows
 print("=" * 60)
@@ -29,16 +35,32 @@ print(df.head())
 print("=" * 60)
 
 # 2. Extract Features (X) and Target (y)
-target_col = 'Wine_Class' if 'Wine_Class' in df.columns else ('class' if 'class' in df.columns else df.columns[-1])
-X = df.drop(columns=[target_col]).values
-y = df[target_col].values.astype(int)
+target_col = None
+for col in df.columns:
+    if col.lower() in ['wine_class', 'class', 'target', 'cultivar', 'label', 'wine']:
+        target_col = col
+        break
 
-print(f"\nTarget Column: '{target_col}' | Number of Features: {X.shape[1]}")
+if target_col is None:
+    if df.iloc[:, 0].nunique() <= 5:
+        target_col = df.columns[0]
+    else:
+        target_col = df.columns[-1]
+
+print(f"\nTarget Column Detected: '{target_col}'")
+X = df.drop(columns=[target_col]).values.astype(float)
+
+# Robust label encoding: works on string names, 1-indexed (1,2,3), or 0-indexed (0,1,2)
+le = LabelEncoder()
+y = le.fit_transform(df[target_col].astype(str))
+
+print(f"Number of Features: {X.shape[1]}")
 print("Classes present:", np.unique(y))
 
 # 3. Train-Test Split (80% train, 20% test)
+stratify_param = y if len(np.unique(y)) > 1 and pd.Series(y).value_counts().min() > 1 else None
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X, y, test_size=0.2, random_state=42, stratify=stratify_param
 )
 
 # 4. Feature Scaling (Standardization is crucial for Neural Networks)
@@ -65,7 +87,8 @@ acc = accuracy_score(y_test, y_pred)
 
 print(f"\nMLP Test Accuracy: {acc * 100:.2f}% (Trained in {mlp.n_iter_} iterations)")
 print("\nClassification Report:")
-print(classification_report(y_test, y_pred, target_names=[f'Cultivar {c}' for c in np.unique(y)]))
+target_names = [f"Class {c}" for c in le.classes_]
+print(classification_report(y_test, y_pred, target_names=target_names, zero_division=0))
 
 # 7. Visualization: Loss Curve and Confusion Matrix
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
@@ -79,7 +102,7 @@ ax1.grid(True, linestyle='--', alpha=0.7)
 
 # Subplot 2: Confusion Matrix Display
 cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[f'Class {c}' for c in np.unique(y)])
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=target_names)
 disp.plot(cmap='Purples', ax=ax2)
 ax2.set_title('Confusion Matrix on Test Data', fontsize=12)
 

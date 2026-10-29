@@ -16,8 +16,14 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 dataset_path = "spam_text.csv"  # <-- REPLACE THIS LINE WITH YOUR ACTUAL CSV PATH
 # ==============================================================================
 
-# 1. Read dataset
-df = pd.read_csv(dataset_path)
+# 1. Read dataset (with encoding fallback for Kaggle spam datasets)
+try:
+    df = pd.read_csv(dataset_path, encoding='utf-8')
+except UnicodeDecodeError:
+    df = pd.read_csv(dataset_path, encoding='latin-1')
+
+# Drop empty / unnamed artifact columns common in Kaggle's spam.csv
+df = df.drop(columns=[c for c in df.columns if 'unnamed' in c.lower()], errors='ignore').dropna()
 
 # Display first 5-6 columns and first 5 rows
 print("=" * 60)
@@ -35,23 +41,26 @@ label_col = None
 
 for col in df.columns:
     col_lower = col.lower()
-    if any(k in col_lower for k in ['message', 'text', 'sms', 'email', 'body', 'content']):
+    if any(k in col_lower for k in ['message', 'text', 'sms', 'email', 'body', 'content', 'v2']):
         text_col = col
-    elif any(k in col_lower for k in ['category', 'label', 'class', 'target', 'type']):
+    elif any(k in col_lower for k in ['category', 'label', 'class', 'target', 'type', 'v1']):
         label_col = col
 
+# Fallback: identify text column as longest average length string
 if text_col is None or label_col is None:
-    # Default to first two columns
-    label_col = df.columns[0]
-    text_col = df.columns[1] if len(df.columns) > 1 else df.columns[0]
+    lengths = {col: df[col].astype(str).str.len().mean() for col in df.columns}
+    sorted_cols = sorted(lengths.items(), key=lambda x: x[1])
+    label_col = sorted_cols[0][0]
+    text_col = sorted_cols[-1][0]
 
 print(f"\nUsing Text Column: '{text_col}' | Label Column: '{label_col}'")
-X = df[text_col].astype(str)
+X = df[text_col].fillna('').astype(str)
 y = df[label_col].astype(str)
 
 # 3. Train-Test Split (80% train, 20% test)
+stratify_param = y if len(np.unique(y)) > 1 and pd.Series(y).value_counts().min() > 1 else None
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X, y, test_size=0.2, random_state=42, stratify=stratify_param
 )
 
 # 4. Build Text Classification Pipeline (Vectorize -> TF-IDF -> MultinomialNB)
@@ -70,7 +79,7 @@ accuracy = accuracy_score(y_test, y_pred)
 
 print(f"\nModel Accuracy: {accuracy * 100:.2f}%")
 print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
+print(classification_report(y_test, y_pred, zero_division=0))
 
 # 7. Test on Sample Live Messages
 sample_messages = [
