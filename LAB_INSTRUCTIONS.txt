@@ -1,0 +1,174 @@
+================================================================================
+MACHINE LEARNING LAB (LINUX) - COMPLETE EXECUTION & REPLACEMENT GUIDE
+================================================================================
+Total Programs: 10
+All 10 programs are pre-configured to work OFFLINE with local CSV files.
+You only need to edit ONE line in each file (the path to your downloaded CSV).
+================================================================================
+
+--------------------------------------------------------------------------------
+PART 1: LINUX LAB ENVIRONMENT SETUP & LIBRARIES
+--------------------------------------------------------------------------------
+Open your Linux terminal (Ctrl + Alt + T) in the folder containing your programs:
+
+1. (Optional but recommended) Create and activate a virtual environment:
+     python3 -m venv ml_env
+     source ml_env/bin/activate
+
+2. Install the required Python libraries:
+     pip install numpy pandas scikit-learn matplotlib
+
+   * If pip is not installed on the Linux system:
+     sudo apt update && sudo apt install -y python3-pip python3-tk
+
+   * If matplotlib gives a GUI display error (Tkinter missing on Linux):
+     sudo apt install -y python3-tk
+
+--------------------------------------------------------------------------------
+PART 2: EXACT LINE TO REPLACE IN EACH PROGRAM
+--------------------------------------------------------------------------------
+In each program, look around lines 14–16. You will see:
+   dataset_path = "..."
+Simply replace the quoted text with the actual path to your downloaded CSV file.
+
+On Linux, you can use:
+  - Relative path (if CSV is in the same folder):  dataset_path = "iris.csv"
+  - Absolute path:                               dataset_path = "/home/student/Downloads/iris.csv"
+  - URL (if allowed to fetch online):            dataset_path = "https://raw.githubusercontent.com/.../iris.csv"
+
+--------------------------------------------------------------------------------
+PROGRAM-BY-PROGRAM REPLACEMENT TABLE
+--------------------------------------------------------------------------------
+
+[PROGRAM 1] linear_svm_iris.py
+  - Target Dataset  : Iris Dataset (e.g., iris.csv)
+  - Line Number     : Line 15
+  - Line in Code    : dataset_path = "iris.csv"
+  - Expected Columns: SepalLength, SepalWidth, PetalLength, PetalWidth, Species
+  - Output Expected : Accuracy score, Classification report, and a 2D decision
+                      boundary plot with support vectors.
+
+[PROGRAM 2] pimaindiansdiabetesdataset.py
+  - Target Dataset  : Pima Indians Diabetes Dataset (e.g., diabetes.csv)
+  - Line Number     : Line 15
+  - Line in Code    : dataset_path = "diabetes.csv"
+  - Expected Columns: Pregnancies, Glucose, BloodPressure, SkinThickness,
+                      Insulin, BMI, DiabetesPedigreeFunction, Age, Outcome
+  - Output Expected : Accuracy percentage, Classification report, and a Confusion
+                      Matrix plot (Seaborn/Matplotlib Blues).
+
+[PROGRAM 3] naivebayestextclassification.py
+  - Target Dataset  : SMS Spam / Text Classification (e.g., spam_text.csv or spam.csv)
+  - Line Number     : Line 16
+  - Line in Code    : dataset_path = "spam_text.csv"
+  - Expected Columns: Category/Label (ham/spam), Message/Text
+  - Output Expected : CountVectorizer + TF-IDF MultinomialNB accuracy, live test
+                      sentence predictions, and Confusion Matrix plot.
+
+[PROGRAM 4] knnimageclassificationfashionmnist.py
+  - Target Dataset  : Fashion-MNIST CSV (e.g., fashion-mnist_train.csv or fashion_mnist.csv)
+  - Line Number     : Line 14
+  - Line in Code    : dataset_path = "fashion_mnist.csv"
+  - Expected Columns: label, pixel1, pixel2, ..., pixel784 (values 0-255)
+  - Output Expected : KNN test accuracy (K=5), classification report, and a visual
+                      grid displaying 6 sample 28x28 clothing items with True vs
+                      Predicted labels.
+
+[PROGRAM 5] customersegmentationdecisiontree.py
+  - Target Dataset  : Customer Segmentation / Mall Customers (e.g., customer_segmentation.csv or Mall_Customers.csv)
+  - Line Number     : Line 15
+  - Line in Code    : dataset_path = "customer_segmentation.csv"
+  - Expected Columns: CustomerID, Gender, Age, Annual_Income, Spending_Score, Segment
+  - Output Expected : Decision tree test accuracy, feature importances ranking, and
+                      a full visual Decision Tree plot with colored nodes.
+
+[PROGRAM 6] logisticregressionvsdecisiontree.py
+  - Target Dataset  : Heart Disease / Medical Classification (e.g., heart_disease.csv or diabetes.csv)
+  - Line Number     : Line 16
+  - Line in Code    : dataset_path = "heart_disease.csv"
+  - Expected Columns: Feature columns (Age, BP, etc.) and target binary class
+  - Output Expected : Formatted table comparing Accuracy, Precision, Recall, and
+                      F1-Score for Logistic Regression vs Decision Tree, plus a
+                      grouped comparison bar plot.
+
+[PROGRAM 7] compare_svm_fashionmnist.py
+  - Target Dataset  : Fashion-MNIST CSV (e.g., fashion_mnist.csv)
+  - Line Number     : Line 15
+  - Line in Code    : dataset_path = "fashion_mnist.csv"
+  - Expected Columns: label, pixel1 to pixel784
+  - Output Expected : Training time and test accuracy comparison table for
+                      Linear, Polynomial (deg=3), and RBF kernels, plus dual bar charts.
+
+[PROGRAM 8] fashion_hyperparameter.py
+  - Target Dataset  : Fashion-MNIST CSV (e.g., fashion_mnist.csv)
+  - Line Number     : Line 14
+  - Line in Code    : dataset_path = "fashion_mnist.csv"
+  - Expected Columns: label, pixel1 to pixel784
+  - Output Expected : GridSearchCV execution log, Best Hyperparameters dictionary,
+                      Best Cross-Validation score, final test accuracy, and a horizontal
+                      bar chart comparing parameter combinations.
+
+[PROGRAM 9] neural_mnist_activations.py
+  - Target Dataset  : MNIST CSV (e.g., mnist_train.csv or mnist.csv)
+  - Line Number     : Line 15
+  - Line in Code    : dataset_path = "mnist.csv"
+  - Expected Columns: label, pixel1 to pixel784
+  - Output Expected : Training iterations, elapsed time, and accuracy for Identity,
+                      Logistic (Sigmoid), Tanh, and ReLU activations, plus a multi-line
+                      Training Loss Convergence plot.
+
+[PROGRAM 10] mlp_wine.py
+  - Target Dataset  : Wine Dataset (e.g., wine.csv)
+  - Line Number     : Line 15
+  - Line in Code    : dataset_path = "wine.csv"
+  - Expected Columns: 13 chemical features (Alcohol, Malic Acid, Ash, etc.) and Wine_Class
+  - Output Expected : MLP Neural Network test accuracy, classification report across
+                      cultivar classes, side-by-side Loss Curve and Confusion Matrix plot.
+
+--------------------------------------------------------------------------------
+PART 3: STEP-BY-STEP LAB EXECUTION IN LINUX
+--------------------------------------------------------------------------------
+1. Download or copy your CSV file onto the Linux machine.
+   (For example, save it into the same folder as the Python scripts).
+
+2. Open the python file in any editor (VS Code, gedit, or nano):
+     gedit linear_svm_iris.py
+   or
+     nano linear_svm_iris.py
+
+3. Replace line 15 with your file's path:
+     dataset_path = "iris.csv"
+
+4. Save the file and run it in terminal:
+     python3 linear_svm_iris.py
+
+5. The program will:
+   a) Print the dataset confirmation and shape.
+   b) Print the first 5 rows and 6 columns (as required for lab viva/evaluation):
+        print(df.iloc[:5, :6])
+        print(df.head())
+   c) Preprocess features, split train/test sets, and train the model.
+   d) Output performance metrics (Accuracy, Classification Report, Confusion Matrix).
+   e) Pop up the interactive Matplotlib plot window for the examiner.
+   f) Close the plot window to return to the shell.
+
+--------------------------------------------------------------------------------
+PART 4: TROUBLESHOOTING IN LINUX LABS
+--------------------------------------------------------------------------------
+Q1: "ModuleNotFoundError: No module named 'pandas'" (or sklearn, matplotlib, numpy)
+A1: Run: pip3 install numpy pandas scikit-learn matplotlib
+
+Q2: "FileNotFoundError: [Errno 2] No such file or directory: '...'"
+A2: Check your path. In Linux, paths are case-sensitive. If your file is in Downloads,
+    use: dataset_path = "/home/<your_username>/Downloads/your_dataset.csv"
+    Or place the CSV directly in the same folder as the script and use:
+    dataset_path = "your_dataset.csv"
+
+Q3: Plot window doesn't appear or says "$DISPLAY not set" (Headless / SSH session)
+A3: If running remotely or without a GUI, add this at the top of the script to save
+    plots directly as PNG files:
+      import matplotlib
+      matplotlib.use('Agg')
+    And replace plt.show() with:
+      plt.savefig('output_plot.png')
+================================================================================
